@@ -1,49 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chetan Mehra</title>
-    <style>
-        .responsive {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            display: block;
-            margin: 10px auto;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chetan Mehra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@0;1&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wall:#22201d;
+    --wall-dark:#191713;
+    --mat:#f6f1e7;
+    --frame:#7a5c3e;
+    --frame-dark:#5a4128;
+    --gold:#c8a561;
+    --ink:#2b2620;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background: radial-gradient(ellipse at top, var(--wall) 0%, var(--wall-dark) 70%);
+    font-family:'Jost', sans-serif;
+    color:#eee7d8;
+    min-height:100vh;
+  }
+
+  header{
+    text-align:center;
+    padding: 64px 20px 40px;
+  }
+
+  header h1{
+    font-family:'Libre Baskerville', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: 0.5px;
+    margin: 0 0 10px;
+    color: #f3ead6;
+  }
+
+  header p{
+    font-style: italic;
+    font-family:'Libre Baskerville', serif;
+    color: var(--gold);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  #gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 46px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 40px 90px;
+  }
+
+  .frame{
+    background: linear-gradient(160deg, var(--frame), var(--frame-dark));
+    padding: 14px;
+    border-radius: 3px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 18px 30px -12px rgba(0,0,0,0.65);
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .frame:hover{
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 26px 40px -14px rgba(0,0,0,0.75);
+  }
+
+  .frame:nth-child(3n+1){ --tilt: -1.2deg; }
+  .frame:nth-child(3n+2){ --tilt: 0.8deg; }
+  .frame:nth-child(3n)  { --tilt: -0.4deg; }
+
+  .mat{
+    background: var(--mat);
+    padding: 14px 14px 10px;
+  }
+
+  .mat img{
+    display:block;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    filter: sepia(8%) saturate(92%);
+  }
+
+  .caption{
+    font-family:'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--ink);
+    text-align: center;
+    padding-top: 10px;
+    letter-spacing: 0.2px;
+  }
+
+  #status{
+    text-align:center;
+    color:#b7ab8f;
+    font-style:italic;
+    padding: 10px 0 40px;
+    font-family:'Libre Baskerville', serif;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .frame, .frame:hover{ transition:none; transform:none; }
+  }
+</style>
 </head>
 <body>
-    <div id="gallery"></div>
 
-    <script>
-        const owner = "CMehra1989";
-        const repo = "HTML_CSS_Photo";
-        const branch = "main";
+<header>
+  <h1>Chetan Mehra</h1>
+  <p>a small wall of moments</p>
+</header>
 
-        fetch(`https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`)
-            .then(response => response.json())
-            .then(files => {
-                const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-                const gallery = document.getElementById("gallery");
+<div id="gallery"></div>
+<p id="status"></p>
 
-                files.forEach(file => {
-                    const lowerName = file.name.toLowerCase();
-                    const isImage = imageExtensions.some(ext => lowerName.endsWith(ext));
+<script>
+  // ---- Configure once here ----
+  const OWNER  = "CMehra1989";
+  const REPO   = "HTML_CSS_Photo";
+  const BRANCH = "main";
+  const PATH   = "";   // e.g. set to "images" if you move photos into an /images folder
+  // ------------------------------
 
-                    if (file.type === "file" && isImage) {
-                        const img = document.createElement("img");
-                        img.src = file.name; // relative path works on GitHub Pages
-                        img.className = "responsive";
-                        img.alt = file.name;
-                        gallery.appendChild(img);
-                    }
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching repo contents:", error);
-            });
-    </script>
+  const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
+  function prettyName(filename){
+    return filename
+      .replace(/\.[^/.]+$/, "")   // drop extension
+      .replace(/[_-]+/g, " ")     // underscores/dashes to spaces
+      .trim();
+  }
+
+  const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}?ref=${BRANCH}`;
+  const gallery = document.getElementById("gallery");
+  const status = document.getElementById("status");
+
+  fetch(apiUrl)
+    .then(res => {
+      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+      return res.json();
+    })
+    .then(files => {
+      const images = files.filter(file =>
+        file.type === "file" &&
+        IMAGE_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(ext))
+      );
+
+      if (images.length === 0){
+        status.textContent = "No images found yet.";
+        return;
+      }
+
+      images.forEach(file => {
+        const srcPath = PATH ? `${PATH}/${file.name}` : file.name;
+
+        const frame = document.createElement("div");
+        frame.className = "frame";
+
+        const mat = document.createElement("div");
+        mat.className = "mat";
+
+        const img = document.createElement("img");
+        img.src = srcPath;
+        img.alt = prettyName(file.name);
+        img.loading = "lazy";
+
+        const caption = document.createElement("div");
+        caption.className = "caption";
+        caption.textContent = prettyName(file.name);
+
+        mat.appendChild(img);
+        mat.appendChild(caption);
+        frame.appendChild(mat);
+        gallery.appendChild(frame);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      status.textContent = "Couldn't load the gallery right now — check back soon.";
+    });
+</script>
+
 </body>
 </html>
