@@ -5,15 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chetan Mehra</title>
     <style>
-.responsive {
-  width: 100%;
-  height: auto;
-}
-</style>
+        .responsive {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
 </head>
 <body>
-    <img src="IMG_0826.JPG" class="responsive">
-    <img src="0362A76F-4642-41EC-9A8D-8154F42DF06A.JPG" class="responsive">
-    <img src="454DB216-1EA8-4852-A869-5CE016A9F405.JPG" class="responsive">
+    <div id="gallery"></div>
+
+    <script>
+        const owner = "CMehra1989";
+        const repo = "HTML_CSS_Photo";
+        const branch = "main";
+
+        fetch(`https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`)
+            .then(response => response.json())
+            .then(files => {
+                const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+                const gallery = document.getElementById("gallery");
+
+                files.forEach(file => {
+                    const lowerName = file.name.toLowerCase();
+                    const isImage = imageExtensions.some(ext => lowerName.endsWith(ext));
+
+                    if (file.type === "file" && isImage) {
+                        const img = document.createElement("img");
+                        img.src = file.name; // relative path works on GitHub Pages
+                        img.className = "responsive";
+                        img.alt = file.name;
+                        gallery.appendChild(img);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching repo contents:", error);
+            });
+    </script>
 </body>
 </html>
