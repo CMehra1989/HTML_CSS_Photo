@@ -8,28 +8,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@0;1&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --wall:#22201d;
-    --wall-dark:#191713;
-    --mat:#f6f1e7;
-    --frame:#7a5c3e;
-    --frame-dark:#5a4128;
-    --gold:#c8a561;
-    --ink:#2b2620;
+    --sky:#f4ece0;
+    --sky-soft:#fbf6ec;
+    --card:#ffffff;
+    --frame:#e8d9c2;
+    --frame-edge:#d9c3a0;
+    --gold:#b9873f;
+    --ink:#3a2f24;
+    --ink-soft:#7a6a56;
   }
 
   *{ box-sizing:border-box; }
 
   body{
     margin:0;
-    background: radial-gradient(ellipse at top, var(--wall) 0%, var(--wall-dark) 70%);
+    background: linear-gradient(180deg, var(--sky) 0%, var(--sky-soft) 100%);
     font-family:'Jost', sans-serif;
-    color:#eee7d8;
+    color:var(--ink);
     min-height:100vh;
   }
 
   header{
     text-align:center;
-    padding: 64px 20px 40px;
+    padding: 60px 20px 34px;
   }
 
   header h1{
@@ -37,7 +38,7 @@
     font-size: clamp(2rem, 5vw, 3rem);
     letter-spacing: 0.5px;
     margin: 0 0 10px;
-    color: #f3ead6;
+    color: var(--ink);
   }
 
   header p{
@@ -48,70 +49,127 @@
     font-size: 1.05rem;
   }
 
-  #gallery{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 46px;
-    max-width: 1200px;
+  #stage{
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 20px 40px 90px;
+    padding: 10px 40px 30px;
+    position: relative;
+  }
+
+  #track-wrap{
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  #track{
+    display: flex;
+    gap: 32px;
+    transition: transform 0.7s cubic-bezier(0.65,0,0.35,1);
   }
 
   .frame{
-    background: linear-gradient(160deg, var(--frame), var(--frame-dark));
-    padding: 14px;
-    border-radius: 3px;
+    flex: 0 0 calc((100% - 64px) / 3);
+    background: linear-gradient(160deg, var(--frame), var(--frame-edge));
+    padding: 12px;
+    border-radius: 6px;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.08) inset,
-      0 18px 30px -12px rgba(0,0,0,0.65);
-    transform: rotate(var(--tilt, 0deg));
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 14px 26px -14px rgba(120,90,50,0.35);
   }
-
-  .frame:hover{
-    transform: rotate(0deg) translateY(-4px);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.08) inset,
-      0 26px 40px -14px rgba(0,0,0,0.75);
-  }
-
-  .frame:nth-child(3n+1){ --tilt: -1.2deg; }
-  .frame:nth-child(3n+2){ --tilt: 0.8deg; }
-  .frame:nth-child(3n)  { --tilt: -0.4deg; }
 
   .mat{
-    background: var(--mat);
-    padding: 14px 14px 10px;
+    background: var(--card);
+    border-radius: 3px;
+    padding: 12px 12px 8px;
   }
 
   .mat img{
     display:block;
     width: 100%;
-    height: 230px;
+    height: 250px;
     object-fit: cover;
-    filter: sepia(8%) saturate(92%);
+    border-radius: 2px;
   }
 
   .caption{
     font-family:'Libre Baskerville', serif;
     font-style: italic;
-    font-size: 0.82rem;
-    color: var(--ink);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
     text-align: center;
     padding-top: 10px;
     letter-spacing: 0.2px;
   }
 
+  .nav-btn{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--card);
+    border: 1px solid var(--frame-edge);
+    color: var(--gold);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 6px 14px -6px rgba(120,90,50,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+    z-index: 5;
+  }
+
+  .nav-btn:hover{ background: var(--frame); transform: translateY(-50%) scale(1.06); }
+  #prevBtn{ left: 4px; }
+  #nextBtn{ right: 4px; }
+
+  #dots{
+    display:flex;
+    justify-content:center;
+    gap: 8px;
+    padding: 22px 0 10px;
+  }
+
+  #dots button{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--frame-edge);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s ease, width 0.2s ease;
+  }
+
+  #dots button.active{
+    background: var(--gold);
+    width: 22px;
+    border-radius: 5px;
+  }
+
   #status{
     text-align:center;
-    color:#b7ab8f;
+    color: var(--ink-soft);
     font-style:italic;
-    padding: 10px 0 40px;
+    padding: 10px 0 60px;
     font-family:'Libre Baskerville', serif;
   }
 
+  @media (max-width: 900px){
+    .frame{ flex: 0 0 calc((100% - 32px) / 2); }
+    #track{ gap: 16px; }
+    #stage{ padding: 10px 46px 30px; }
+  }
+
+  @media (max-width: 600px){
+    .frame{ flex: 0 0 100%; }
+    .mat img{ height: 300px; }
+  }
+
   @media (prefers-reduced-motion: reduce){
-    .frame, .frame:hover{ transition:none; transform:none; }
+    #track{ transition:none; }
   }
 </style>
 </head>
@@ -122,7 +180,14 @@
   <p>a small wall of moments</p>
 </header>
 
-<div id="gallery"></div>
+<div id="stage">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous">&#8249;</button>
+  <div id="track-wrap">
+    <div id="track"></div>
+  </div>
+  <button class="nav-btn" id="nextBtn" aria-label="Next">&#8250;</button>
+</div>
+<div id="dots"></div>
 <p id="status"></p>
 
 <script>
@@ -131,20 +196,72 @@
   const REPO   = "HTML_CSS_Photo";
   const BRANCH = "main";
   const PATH   = "";   // e.g. set to "images" if you move photos into an /images folder
+  const PER_VIEW_DESKTOP = 3;
+  const AUTO_ADVANCE_MS = 4500;
   // ------------------------------
 
   const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
 
-  function prettyName(filename){
-    return filename
-      .replace(/\.[^/.]+$/, "")   // drop extension
-      .replace(/[_-]+/g, " ")     // underscores/dashes to spaces
-      .trim();
+  const track = document.getElementById("track");
+  const status = document.getElementById("status");
+  const dotsWrap = document.getElementById("dots");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let slideIndex = 0;
+  let totalSlides = 0;
+  let perView = PER_VIEW_DESKTOP;
+  let autoTimer = null;
+
+  function currentPerView(){
+    const w = window.innerWidth;
+    if (w <= 600) return 1;
+    if (w <= 900) return 2;
+    return 3;
   }
 
+  function goTo(i){
+    const maxIndex = Math.max(0, totalSlides - perView);
+    slideIndex = ((i % (maxIndex+1)) + (maxIndex+1)) % (maxIndex+1);
+    const frameEl = track.children[0];
+    if (!frameEl) return;
+    const gap = 32 <= window.innerWidth ? (window.innerWidth <= 900 ? 16 : 32) : 32;
+    const frameWidth = frameEl.getBoundingClientRect().width + gap;
+    track.style.transform = `translateX(${-slideIndex * frameWidth}px)`;
+    updateDots();
+  }
+
+  function updateDots(){
+    const maxIndex = Math.max(0, totalSlides - perView);
+    dotsWrap.innerHTML = "";
+    for(let i=0;i<=maxIndex;i++){
+      const b = document.createElement("button");
+      if(i===slideIndex) b.classList.add("active");
+      b.addEventListener("click", ()=>{ goTo(i); restartAuto(); });
+      dotsWrap.appendChild(b);
+    }
+  }
+
+  function next(){ goTo(slideIndex+1); }
+  function prev(){ goTo(slideIndex-1); }
+
+  function restartAuto(){
+    if(autoTimer) clearInterval(autoTimer);
+    autoTimer = setInterval(next, AUTO_ADVANCE_MS);
+  }
+
+  prevBtn.addEventListener("click", ()=>{ prev(); restartAuto(); });
+  nextBtn.addEventListener("click", ()=>{ next(); restartAuto(); });
+
+  window.addEventListener("resize", ()=>{
+    const newPerView = currentPerView();
+    if(newPerView !== perView){
+      perView = newPerView;
+    }
+    goTo(slideIndex);
+  });
+
   const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}?ref=${BRANCH}`;
-  const gallery = document.getElementById("gallery");
-  const status = document.getElementById("status");
 
   fetch(apiUrl)
     .then(res => {
@@ -162,7 +279,7 @@
         return;
       }
 
-      images.forEach(file => {
+      images.forEach((file, idx) => {
         const srcPath = PATH ? `${PATH}/${file.name}` : file.name;
 
         const frame = document.createElement("div");
@@ -173,18 +290,23 @@
 
         const img = document.createElement("img");
         img.src = srcPath;
-        img.alt = prettyName(file.name);
+        img.alt = `Moment ${idx + 1}`;
         img.loading = "lazy";
 
         const caption = document.createElement("div");
         caption.className = "caption";
-        caption.textContent = prettyName(file.name);
+        caption.textContent = `Moment ${idx + 1}`;
 
         mat.appendChild(img);
         mat.appendChild(caption);
         frame.appendChild(mat);
-        gallery.appendChild(frame);
+        track.appendChild(frame);
       });
+
+      totalSlides = images.length;
+      perView = currentPerView();
+      updateDots();
+      restartAuto();
     })
     .catch(err => {
       console.error(err);
