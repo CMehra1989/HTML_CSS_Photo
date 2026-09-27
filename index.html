@@ -10,9 +10,6 @@
   :root{
     --sky:#f4ece0;
     --sky-soft:#fbf6ec;
-    --card:#ffffff;
-    --frame:#e8d9c2;
-    --frame-edge:#d9c3a0;
     --gold:#b9873f;
     --ink:#3a2f24;
     --ink-soft:#7a6a56;
@@ -20,24 +17,30 @@
 
   *{ box-sizing:border-box; }
 
-  body{
+  html, body{
+    height:100%;
     margin:0;
+  }
+
+  body{
+    display:flex;
+    flex-direction:column;
     background: linear-gradient(180deg, var(--sky) 0%, var(--sky-soft) 100%);
     font-family:'Jost', sans-serif;
     color:var(--ink);
-    min-height:100vh;
   }
 
   header{
     text-align:center;
-    padding: 60px 20px 34px;
+    padding: 26px 20px 16px;
+    flex: 0 0 auto;
   }
 
   header h1{
     font-family:'Libre Baskerville', serif;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
     letter-spacing: 0.5px;
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     color: var(--ink);
   }
 
@@ -46,90 +49,56 @@
     font-family:'Libre Baskerville', serif;
     color: var(--gold);
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
-  #stage{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 10px 40px 30px;
-    position: relative;
-  }
-
-  #track-wrap{
+  #mosaic{
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0 24px 20px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1.05fr 1.05fr 1.3fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+      "a b c"
+      "d e c";
+    border-radius: 8px;
     overflow: hidden;
-    border-radius: 10px;
   }
 
-  #track{
-    display: flex;
-    gap: 32px;
-    transition: transform 0.7s cubic-bezier(0.65,0,0.35,1);
+  .tile{
+    position: relative;
+    overflow: hidden;
+    background: #e8e0d2;
   }
 
-  .frame{
-    flex: 0 0 calc((100% - 64px) / 3);
-    background: linear-gradient(160deg, var(--frame), var(--frame-edge));
-    padding: 12px;
-    border-radius: 6px;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.5) inset,
-      0 14px 26px -14px rgba(120,90,50,0.35);
-  }
-
-  .mat{
-    background: var(--card);
-    border-radius: 3px;
-    padding: 12px 12px 8px;
-  }
-
-  .mat img{
-    display:block;
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 2px;
-  }
-
-  .caption{
-    font-family:'Libre Baskerville', serif;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    text-align: center;
-    padding-top: 10px;
-    letter-spacing: 0.2px;
-  }
-
-  .nav-btn{
+  .tile img{
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--card);
-    border: 1px solid var(--frame-edge);
-    color: var(--gold);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 6px 14px -6px rgba(120,90,50,0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease, transform 0.2s ease;
-    z-index: 5;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.9s ease;
   }
 
-  .nav-btn:hover{ background: var(--frame); transform: translateY(-50%) scale(1.06); }
-  #prevBtn{ left: 4px; }
-  #nextBtn{ right: 4px; }
+  .tile img.show{
+    opacity: 1;
+  }
+
+  .tile[data-slot="a"]{ grid-area: a; }
+  .tile[data-slot="b"]{ grid-area: b; }
+  .tile[data-slot="c"]{ grid-area: c; }
+  .tile[data-slot="d"]{ grid-area: d; }
+  .tile[data-slot="e"]{ grid-area: e; }
 
   #dots{
     display:flex;
     justify-content:center;
     gap: 8px;
-    padding: 22px 0 10px;
+    padding: 0 0 20px;
+    flex: 0 0 auto;
   }
 
   #dots button{
@@ -137,7 +106,7 @@
     height: 8px;
     border-radius: 50%;
     border: none;
-    background: var(--frame-edge);
+    background: #d9c3a0;
     cursor: pointer;
     padding: 0;
     transition: background 0.2s ease, width 0.2s ease;
@@ -153,23 +122,21 @@
     text-align:center;
     color: var(--ink-soft);
     font-style:italic;
-    padding: 10px 0 60px;
+    padding: 0 0 20px;
     font-family:'Libre Baskerville', serif;
+    flex: 0 0 auto;
   }
 
-  @media (max-width: 900px){
-    .frame{ flex: 0 0 calc((100% - 32px) / 2); }
-    #track{ gap: 16px; }
-    #stage{ padding: 10px 46px 30px; }
-  }
-
-  @media (max-width: 600px){
-    .frame{ flex: 0 0 100%; }
-    .mat img{ height: 300px; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    #track{ transition:none; }
+  @media (max-width: 760px){
+    #mosaic{
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-areas:
+        "a b"
+        "d e"
+        "c c";
+      margin: 0 14px 16px;
+    }
   }
 </style>
 </head>
@@ -180,12 +147,12 @@
   <p>a small wall of moments</p>
 </header>
 
-<div id="stage">
-  <button class="nav-btn" id="prevBtn" aria-label="Previous">&#8249;</button>
-  <div id="track-wrap">
-    <div id="track"></div>
-  </div>
-  <button class="nav-btn" id="nextBtn" aria-label="Next">&#8250;</button>
+<div id="mosaic">
+  <div class="tile" data-slot="a"></div>
+  <div class="tile" data-slot="b"></div>
+  <div class="tile" data-slot="c"></div>
+  <div class="tile" data-slot="d"></div>
+  <div class="tile" data-slot="e"></div>
 </div>
 <div id="dots"></div>
 <p id="status"></p>
@@ -196,70 +163,75 @@
   const REPO   = "HTML_CSS_Photo";
   const BRANCH = "main";
   const PATH   = "";   // e.g. set to "images" if you move photos into an /images folder
-  const PER_VIEW_DESKTOP = 3;
   const AUTO_ADVANCE_MS = 4500;
+  const SLOTS = ["a","b","c","d","e"];
   // ------------------------------
 
   const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
-  const track = document.getElementById("track");
   const status = document.getElementById("status");
   const dotsWrap = document.getElementById("dots");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
+  const tiles = {};
+  SLOTS.forEach(s => tiles[s] = document.querySelector(`.tile[data-slot="${s}"]`));
 
-  let slideIndex = 0;
-  let totalSlides = 0;
-  let perView = PER_VIEW_DESKTOP;
+  let images = [];
+  let groupIndex = 0;
+  let totalGroups = 0;
   let autoTimer = null;
 
-  function currentPerView(){
-    const w = window.innerWidth;
-    if (w <= 600) return 1;
-    if (w <= 900) return 2;
-    return 3;
+  function preload(src){
+    return new Promise(resolve => {
+      const im = new Image();
+      im.onload = () => resolve();
+      im.onerror = () => resolve();
+      im.src = src;
+    });
   }
 
-  function goTo(i){
-    const maxIndex = Math.max(0, totalSlides - perView);
-    slideIndex = ((i % (maxIndex+1)) + (maxIndex+1)) % (maxIndex+1);
-    const frameEl = track.children[0];
-    if (!frameEl) return;
-    const gap = 32 <= window.innerWidth ? (window.innerWidth <= 900 ? 16 : 32) : 32;
-    const frameWidth = frameEl.getBoundingClientRect().width + gap;
-    track.style.transform = `translateX(${-slideIndex * frameWidth}px)`;
+  async function showGroup(i){
+    const maxIndex = Math.max(0, totalGroups - 1);
+    groupIndex = ((i % (maxIndex+1)) + (maxIndex+1)) % (maxIndex+1);
+    const startIdx = groupIndex * SLOTS.length;
+
+    for (let s = 0; s < SLOTS.length; s++){
+      const slot = SLOTS[s];
+      const file = images[(startIdx + s) % images.length];
+      if (!file) continue;
+
+      const srcPath = PATH ? `${PATH}/${file.name}` : file.name;
+      await preload(srcPath);
+
+      const tile = tiles[slot];
+      const oldImg = tile.querySelector("img");
+      const newImg = document.createElement("img");
+      newImg.src = srcPath;
+      newImg.alt = "A moment";
+      tile.appendChild(newImg);
+      requestAnimationFrame(() => newImg.classList.add("show"));
+
+      if (oldImg){
+        oldImg.classList.remove("show");
+        setTimeout(() => { if(oldImg.parentNode) oldImg.remove(); }, 950);
+      }
+    }
     updateDots();
   }
 
   function updateDots(){
-    const maxIndex = Math.max(0, totalSlides - perView);
     dotsWrap.innerHTML = "";
-    for(let i=0;i<=maxIndex;i++){
+    for(let i=0;i<totalGroups;i++){
       const b = document.createElement("button");
-      if(i===slideIndex) b.classList.add("active");
-      b.addEventListener("click", ()=>{ goTo(i); restartAuto(); });
+      if(i===groupIndex) b.classList.add("active");
+      b.addEventListener("click", ()=>{ showGroup(i); restartAuto(); });
       dotsWrap.appendChild(b);
     }
   }
 
-  function next(){ goTo(slideIndex+1); }
-  function prev(){ goTo(slideIndex-1); }
+  function next(){ showGroup(groupIndex+1); }
 
   function restartAuto(){
     if(autoTimer) clearInterval(autoTimer);
     autoTimer = setInterval(next, AUTO_ADVANCE_MS);
   }
-
-  prevBtn.addEventListener("click", ()=>{ prev(); restartAuto(); });
-  nextBtn.addEventListener("click", ()=>{ next(); restartAuto(); });
-
-  window.addEventListener("resize", ()=>{
-    const newPerView = currentPerView();
-    if(newPerView !== perView){
-      perView = newPerView;
-    }
-    goTo(slideIndex);
-  });
 
   const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}?ref=${BRANCH}`;
 
@@ -269,7 +241,7 @@
       return res.json();
     })
     .then(files => {
-      const images = files.filter(file =>
+      images = files.filter(file =>
         file.type === "file" &&
         IMAGE_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(ext))
       );
@@ -279,33 +251,8 @@
         return;
       }
 
-      images.forEach((file, idx) => {
-        const srcPath = PATH ? `${PATH}/${file.name}` : file.name;
-
-        const frame = document.createElement("div");
-        frame.className = "frame";
-
-        const mat = document.createElement("div");
-        mat.className = "mat";
-
-        const img = document.createElement("img");
-        img.src = srcPath;
-        img.alt = `Moment ${idx + 1}`;
-        img.loading = "lazy";
-
-        const caption = document.createElement("div");
-        caption.className = "caption";
-        caption.textContent = `Moment ${idx + 1}`;
-
-        mat.appendChild(img);
-        mat.appendChild(caption);
-        frame.appendChild(mat);
-        track.appendChild(frame);
-      });
-
-      totalSlides = images.length;
-      perView = currentPerView();
-      updateDots();
+      totalGroups = Math.max(1, Math.ceil(images.length / SLOTS.length));
+      showGroup(0);
       restartAuto();
     })
     .catch(err => {
