@@ -178,6 +178,15 @@
   let totalGroups = 0;
   let autoTimer = null;
 
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
   function preload(src){
     return new Promise(resolve => {
       const im = new Image();
@@ -226,7 +235,13 @@
     }
   }
 
-  function next(){ showGroup(groupIndex+1); }
+  function next(){
+    const wrapping = (groupIndex + 1) >= totalGroups;
+    if (wrapping){
+      images = shuffle(images);
+    }
+    showGroup(groupIndex + 1);
+  }
 
   function restartAuto(){
     if(autoTimer) clearInterval(autoTimer);
@@ -252,6 +267,7 @@
       }
 
       totalGroups = Math.max(1, Math.ceil(images.length / SLOTS.length));
+      images = shuffle(images);
       showGroup(0);
       restartAuto();
     })
